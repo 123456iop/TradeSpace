@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TradeSpace</title>
+    <!-- Підключення стилів -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<header>
+    <nav>
+        <div class="logo">
+            <a href="/">TradeSpace</a>
+        </div>
+        <div class="menu">
+            <!-- Посилання на сторінку товарів та кошик -->
+            <a asp-controller="Products" asp-action="Index">Каталог</a>
+            <a asp-controller="Cart" asp-action="Index">Кошик</a>
+        </div>
+    </nav>
+</header>
+
+<main role="main" class="container">
+    <!-- Саме сюди буде підставлятися код конкретних сторінок (Index, Details тощо) -->
+    @RenderBody() 
+</main>
+
+<footer>
+    <p>&copy; @DateTime.Now.Year - TradeSpace. Всі права захищено.</p>
+</footer>
+
+<!-- Секція для підключення додаткових скриптів на окремих сторінках -->
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

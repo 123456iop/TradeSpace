@@ -1,0 +1,32 @@
+﻿@* Вказуємо тип моделі, яку очікуємо з контролера (список товарів) *@
+@model IEnumerable<TradeSpace.Models.Product>
+
+@{
+    ViewData["Title"] = "Каталог товарів";
+}
+
+<h1>Каталог TradeSpace</h1>
+
+<div class="products-grid">
+    @foreach (var item in Model)
+    {
+        <div class="product-card">
+            @* Виводимо назву та ціну *@
+            <h3>@item.Title</h3>
+            <p class="price">@item.Price ₴</p>
+            <p>В наявності: @item.StockQuantity шт.</p>
+            
+            @* Кнопка для переходу на сторінку деталей товару *@
+            <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Id" class="btn">
+                Детальніше
+            </a>
+            
+            @* Форма для додавання в кошик *@
+            <form asp-controller="Cart" asp-action="Add" method="post">
+                <input type="hidden" name="productId" value="@item.Id" />
+                <input type="number" name="quantity" value="1" min="1" max="@item.StockQuantity" />
+                <button type="submit" class="btn btn-primary">В кошик</button>
+            </form>
+        </div>
+    }
+</div>

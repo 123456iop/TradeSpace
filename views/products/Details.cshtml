@@ -1,0 +1,38 @@
+﻿@* Тут очікуємо не список, а один конкретний об'єкт товару *@
+@model TradeSpace.Models.Product
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="product-details">
+    <a asp-action="Index">← Повернутися до каталогу</a>
+
+    <h2>@Model.Title</h2>
+    
+    <div class="product-info">
+        @* Якщо у товару є магазин, виводимо його назву *@
+        <p><strong>Продавець:</strong> @Model.Store?.Name</p>
+        
+        <p class="price-large">Ціна: @Model.Price ₴</p>
+        
+        <div class="description">
+            <h4>Опис:</h4>
+            <p>@Model.Description</p>
+        </div>
+
+        @if (Model.StockQuantity > 0)
+        {
+            <form asp-controller="Cart" asp-action="Add" method="post">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <label for="quantity">Кількість:</label>
+                <input type="number" name="quantity" value="1" min="1" max="@Model.StockQuantity" />
+                <button type="submit" class="btn btn-success">Додати в кошик</button>
+            </form>
+        }
+        else
+        {
+            <p class="text-danger">Немає в наявності</p>
+        }
+    </div>
+</div>
