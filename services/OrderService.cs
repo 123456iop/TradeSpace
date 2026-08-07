@@ -39,10 +39,8 @@ namespace TradeSpace.Services
                 UserId = userId,
                 ShippingAddress = shippingAddress,
                 TotalAmount = totalAmount,
-                Status = "Нове", // Можна використовувати Enum з вашого файлу Enums.cs, якщо він там є
+                Status = "Нове",
                 CreatedAt = DateTime.UtcNow
-                // Якщо у вашій моделі Order є список OrderItems, 
-                // тут потрібно в циклі перенести дані з cartItems у цей список.
             };
 
             _context.Orders.Add(order);
@@ -56,7 +54,7 @@ namespace TradeSpace.Services
 
         public async Task<Order> GetOrderByIdAsync(int orderId)
         {
-            // Отримуємо замовлення (за потреби тут можна підтягнути користувача через .Include(o => o.User))
+            // Отримуємо замовлення
             return await _context.Orders
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
