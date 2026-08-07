@@ -1,0 +1,13 @@
+Index: controllers/67.cs
+===================================================================
+diff --git a/controllers/67.cs b/controllers/67.cs
+deleted file mode 100644
+--- a/controllers/67.cs	(revision 6c92033e53573570fbe5007d79c0300bed810762)
++++ /dev/null	(revision 6c92033e53573570fbe5007d79c0300bed810762)
+@@ -1,5 +0,0 @@
+-namespace DefaultNamespace;
+-
+-public class 67 {
+-    
+-}
+\ No newline at end of file
