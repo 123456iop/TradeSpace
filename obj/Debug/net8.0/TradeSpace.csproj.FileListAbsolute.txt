@@ -1,0 +1,10 @@
+C:\Users\zenai\RiderProjects\TradeSpace\obj\Debug\net8.0\TradeSpace.csproj.AssemblyReference.cache
+C:\Users\zenai\RiderProjects\TradeSpace\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\zenai\RiderProjects\TradeSpace\obj\Debug\net8.0\TradeSpace.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\zenai\RiderProjects\TradeSpace\obj\Debug\net8.0\TradeSpace.AssemblyInfoInputs.cache
+C:\Users\zenai\RiderProjects\TradeSpace\obj\Debug\net8.0\TradeSpace.AssemblyInfo.cs
+C:\Users\zenai\RiderProjects\TradeSpace\obj\Debug\net8.0\TradeSpace.csproj.CoreCompileInputs.cache
+C:\Users\zenai\RiderProjects\TradeSpace\obj\Debug\net8.0\TradeSpace.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\zenai\RiderProjects\TradeSpace\obj\Debug\net8.0\TradeSpace.RazorAssemblyInfo.cache
+C:\Users\zenai\RiderProjects\TradeSpace\obj\Debug\net8.0\TradeSpace.RazorAssemblyInfo.cs
+C:\Users\zenai\RiderProjects\TradeSpace\obj\Debug\net8.0\TradeSpace.sourcelink.json
