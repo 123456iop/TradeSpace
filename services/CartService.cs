@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -16,96 +16,60 @@ namespace TradeSpace.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Cart>> GetCartByUserIdAsync(int userId)
+        public async Task<Cart> GetCartByUserIdAsync(Guid userId)
         {
-            return await _context.Carts
-                .Include(c => c.Product) // Підтягуємо дані про товар (назва, зображення, ціна)
-                .Where(c => c.UserId == userId)
-                .ToListAsync();
+            // Шукаємо кошик разом із його елементами (CartItem) та даними товарів
+            var cart = await _context.Carts
+                .Include(c => c.Items)
+                    .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            // Якщо кошика ще немає - створюємо його, як це очікує контролер
+            if (cart == null)
+            {
+                cart = new Cart { UserId = userId };
+                _context.Carts.Add(cart);
+                await _context.SaveChangesAsync();
+            }
+
+            return cart;
         }
 
-        public async Task AddToCartAsync(int userId, int productId, int quantity = 1)
+        public async Task AddToCartAsync(Guid userId, Guid productId, int quantity)
         {
-            // Шукаємо, чи є вже цей товар у кошику цього користувача
-            var cartItem = await _context.Carts
-                .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
+            var cart = await GetCartByUserIdAsync(userId);
+            
+            // Шукаємо товар безпосередньо у списку Items кошика
+            var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
 
-            if (cartItem != null)
+            if (existingItem != null)
             {
-                // Якщо є, просто збільшуємо кількість
-                cartItem.Quantity += quantity;
-                _context.Carts.Update(cartItem);
+                existingItem.Quantity += quantity;
             }
             else
             {
-                // Якщо немає, створюємо новий запис
-                cartItem = new Cart
+                cart.Items.Add(new CartItem
                 {
-                    UserId = userId,
                     ProductId = productId,
                     Quantity = quantity
-                };
-                _context.Carts.Add(cartItem);
+                });
             }
 
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveFromCartAsync(int userId, int productId)
+        public async Task ClearCartAsync(Guid cartId)
         {
-            var cartItem = await _context.Carts
-                .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
+            var cart = await _context.Carts
+                .Include(c => c.Items)
+                .FirstOrDefaultAsync(c => c.Id == cartId);
 
-            if (cartItem != null)
+            if (cart != null && cart.Items.Any())
             {
-                _context.Carts.Remove(cartItem);
+                // Очищаємо зв'язані елементи кошика
+                _context.RemoveRange(cart.Items);
                 await _context.SaveChangesAsync();
             }
-        }
-
-        public async Task UpdateQuantityAsync(int userId, int productId, int quantity)
-        {
-            var cartItem = await _context.Carts
-                .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId);
-
-            if (cartItem != null)
-            {
-                if (quantity <= 0)
-                {
-                    // Якщо передали 0 або менше, видаляємо товар з кошика
-                    _context.Carts.Remove(cartItem);
-                }
-                else
-                {
-                    // Інакше оновлюємо кількість
-                    cartItem.Quantity = quantity;
-                    _context.Carts.Update(cartItem);
-                }
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async Task ClearCartAsync(int userId)
-        {
-            var cartItems = await _context.Carts
-                .Where(c => c.UserId == userId)
-                .ToListAsync();
-
-            if (cartItems.Any())
-            {
-                _context.Carts.RemoveRange(cartItems);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        public async Task<decimal> GetTotalAsync(int userId)
-        {
-            var cartItems = await _context.Carts
-                .Include(c => c.Product)
-                .Where(c => c.UserId == userId)
-                .ToListAsync();
-            
-            return cartItems.Sum(c => c.Product.Price * c.Quantity); 
         }
     }
 }
