@@ -17,9 +17,45 @@ namespace TradeSpace.Services
             _context = context;
         }
 
+        // Оновлений метод із підтримкою пошуку, категорії та пагінації
+        public async Task<(IEnumerable<Product> Products, int TotalPages)> GetFilteredProductsAsync(
+            string? searchString, Guid? categoryId, int pageNumber, int pageSize)
+        {
+            var query = _context.Products
+                .Where(p => p.IsActive)
+                .Include(p => p.Images)
+                .Include(p => p.Category)
+                .Include(p => p.Store)
+                .AsQueryable();
+
+            // Фільтрація за пошуковим запитом
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                query = query.Where(p => p.Title.Contains(searchString) || (p.Description != null && p.Description.Contains(searchString)));
+            }
+
+            // Фільтрація за категорією
+            if (categoryId.HasValue && categoryId.Value != Guid.Empty)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+
+            // Рахуємо загальну кількість сторінок
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            // Застосовуємо пагінацію
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (products, totalPages);
+        }
+
+        // Залишаємо старий метод для сумісності, якщо він десь ще використовується
         public async Task<IEnumerable<Product>> GetAllActiveProductsAsync()
         {
-            // Додано Include для завантаження зв'язаних даних (Images, Category, Store)
             return await _context.Products
                 .Where(p => p.IsActive)
                 .Include(p => p.Images)
@@ -31,7 +67,7 @@ namespace TradeSpace.Services
         public async Task<Product?> GetProductByIdAsync(Guid id)
         {
             return await _context.Products
-                .Include(p => p.Images) // Додано завантаження картинок і для сторінки Details
+                .Include(p => p.Images)
                 .Include(p => p.Category)
                 .Include(p => p.Store)
                 .FirstOrDefaultAsync(p => p.Id == id);

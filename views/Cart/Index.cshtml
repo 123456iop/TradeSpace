@@ -1,0 +1,62 @@
+﻿@model TradeSpace.Models.Cart
+
+@{
+    ViewData["Title"] = "Мій кошик";
+}
+
+<div class="container mt-4">
+    <h2>Кошик</h2>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (Model == null || !Model.Items.Any())
+    {
+        <div class="alert alert-info">
+            Ваш кошик порожній. <a asp-controller="Products" asp-action="Index">Перейти до каталогу</a>
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Товар</th>
+                    <th>Ціна</th>
+                    <th>Кількість</th>
+                    <th>Сума</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@(item.Product?.Title ?? "Товар")</td>
+                        <td>@(item.Product?.Price.ToString("C") ?? "0")</td>
+                        <td>@item.Quantity</td>
+                        <td>@((item.Quantity * (item.Product?.Price ?? 0)).ToString("C"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <!-- Очищення кошика -->
+            <form asp-controller="Cart" asp-action="Clear" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="cartId" value="@Model.Id" />
+                <input type="hidden" name="userId" value="@Model.UserId" />
+                <button type="submit" class="btn btn-outline-danger">Очистити кошик</button>
+            </form>
+
+            <!-- Кнопка оформлення замовлення (передаємо той самий userId) -->
+            <a asp-controller="Orders" asp-action="Checkout" asp-route-userId="@Model.UserId" class="btn btn-success">
+                Оформити замовлення
+            </a>
+        </div>
+    }
+</div>

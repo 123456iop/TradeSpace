@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Замовлення оформлено";
+    var orderId = ViewBag.OrderId;
+}
+
+<div class="container mt-5 text-center">
+    <div class="alert alert-success">
+        <h1 class="display-4">Дякуємо за замовлення!</h1>
+        <p class="lead">Ваше замовлення успішно створено та передано в обробку.</p>
+        <hr>
+        <p>Номер замовлення: <strong>@orderId</strong></p>
+    </div>
+
+    <a asp-controller="Products" asp-action="Index" class="btn btn-primary mt-3">Продовжити покупки</a>
+</div>

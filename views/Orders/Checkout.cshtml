@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Оформлення замовлення";
+    var userId = ViewBag.UserId;
+}
+
+<div class="container mt-4">
+    <h2>Оформлення замовлення</h2>
+
+    <form asp-controller="Orders" asp-action="Checkout" method="post" class="mt-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="userId" value="@userId" />
+
+        <div class="mb-3">
+            <label for="shippingAddress" class="form-label">Адреса доставки</label>
+            <textarea name="shippingAddress" id="shippingAddress" class="form-control" rows="3" required></textarea>
+            <span class="text-danger" @Html.ValidationMessage("shippingAddress")></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Підтвердити замовлення</button>
+        <a asp-controller="Cart" asp-action="Index" asp-route-userId="@userId" class="btn btn-secondary">Повернутися в кошик</a>
+    </form>
+</div>

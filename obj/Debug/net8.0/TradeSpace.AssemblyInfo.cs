@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TradeSpace")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9d485670f97963af0d21b9331af4270f0f8720ab")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d36bf7d87425728931f5153bee940e50c4177019")]
 [assembly: System.Reflection.AssemblyProductAttribute("TradeSpace")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TradeSpace")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

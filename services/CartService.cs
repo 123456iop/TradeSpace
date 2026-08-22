@@ -27,6 +27,18 @@ namespace TradeSpace.Services
             // Якщо кошика ще немає - створюємо його, як це очікує контролер
             if (cart == null)
             {
+                // Перевіряємо наявність користувача, щоб уникнути помилки FOREIGN KEY
+                var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+                if (!userExists)
+                {
+                    var testUser = new User
+                    {
+                        Id = userId
+                    };
+                    _context.Users.Add(testUser);
+                    await _context.SaveChangesAsync();
+                }
+
                 cart = new Cart { UserId = userId };
                 _context.Carts.Add(cart);
                 await _context.SaveChangesAsync();

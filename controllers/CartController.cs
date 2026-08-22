@@ -6,6 +6,9 @@ namespace TradeSpace.Controllers;
 public class CartController : Controller
 {
     private readonly ICartService _cartService;
+    
+    // Тестовий ID за замовчуванням, поки немає повноцінної авторизації
+    private static readonly Guid DefaultUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
     public CartController(ICartService cartService)
     {
@@ -13,48 +16,43 @@ public class CartController : Controller
     }
 
     // GET: /Cart?userId=...
-    // Перегляд кошика користувача
     [HttpGet]
-    public async Task<IActionResult> Index(Guid userId)
+    public async Task<IActionResult> Index(Guid? userId)
     {
-        // Отримуємо кошик конкретного користувача (якщо його немає, сервіс створить новий)
-        var cart = await _cartService.GetCartByUserIdAsync(userId);
-        return View(cart); // Відображаємо Views/Cart/Index.cshtml
+        // Якщо ID не передано, використовуємо дефолтний тестовий
+        var currentUserId = userId ?? DefaultUserId;
+
+        var cart = await _cartService.GetCartByUserIdAsync(currentUserId);
+        return View(cart);
     }
 
     // POST: /Cart/Add
-    // Додавання товару до кошика з форми на сторінці каталогу або детальної картки
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Add(Guid userId, Guid productId, int quantity)
+    public async Task<IActionResult> Add(Guid? userId, Guid productId, int quantity)
     {
+        var currentUserId = userId ?? DefaultUserId;
+
         try
         {
-            // Намагаємося додати товар до кошика
-            await _cartService.AddToCartAsync(userId, productId, quantity);
-            
-            // Після успішного додавання перенаправляємо користувача до його кошика
-            return RedirectToAction(nameof(Index), new { userId });
+            await _cartService.AddToCartAsync(currentUserId, productId, quantity);
+            return RedirectToAction(nameof(Index), new { userId = currentUserId });
         }
         catch (Exception ex)
         {
-            // Якщо товару немає на складі або сталася інша помилка,
-            // зберігаємо текст помилки у TempData та повертаємо на сторінку товару
             TempData["ErrorMessage"] = ex.Message;
             return RedirectToAction("Details", "Products", new { id = productId });
         }
     }
 
     // POST: /Cart/Clear
-    // Очищення всіх товарів із кошика
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Clear(Guid cartId, Guid userId)
+    public async Task<IActionResult> Clear(Guid cartId, Guid? userId)
     {
-        // Очищаємо всі товари з кошика
+        var currentUserId = userId ?? DefaultUserId;
+
         await _cartService.ClearCartAsync(cartId);
-        
-        // Оновлюємо сторінку кошика
-        return RedirectToAction(nameof(Index), new { userId });
+        return RedirectToAction(nameof(Index), new { userId = currentUserId });
     }
 }
