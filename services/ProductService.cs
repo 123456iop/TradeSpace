@@ -19,15 +19,19 @@ namespace TradeSpace.Services
 
         public async Task<IEnumerable<Product>> GetAllActiveProductsAsync()
         {
-            // Отримуємо лише активні товари
+            // Додано Include для завантаження зв'язаних даних (Images, Category, Store)
             return await _context.Products
                 .Where(p => p.IsActive)
+                .Include(p => p.Images)
+                .Include(p => p.Category)
+                .Include(p => p.Store)
                 .ToListAsync();
         }
 
         public async Task<Product?> GetProductByIdAsync(Guid id)
         {
             return await _context.Products
+                .Include(p => p.Images) // Додано завантаження картинок і для сторінки Details
                 .Include(p => p.Category)
                 .Include(p => p.Store)
                 .FirstOrDefaultAsync(p => p.Id == id);

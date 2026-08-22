@@ -1,4 +1,4 @@
-﻿// Product.cs & ProductImage.cs
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace TradeSpace.Models;
 
@@ -7,7 +7,10 @@ public class Product
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
+    
+    [Precision(18, 2)]
     public decimal Price { get; set; }
+    
     public int StockQuantity { get; set; } // Залишок на складі
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

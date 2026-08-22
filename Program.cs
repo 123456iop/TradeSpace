@@ -13,7 +13,7 @@ builder.Services.AddControllersWithViews();
 
 // Налаштування Entity Framework Core з використанням ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite("Data Source=tradespace.db"));
 
 // Реєстрація сервісів бізнес-логіки
 builder.Services.AddScoped<IProductService, ProductService>();
