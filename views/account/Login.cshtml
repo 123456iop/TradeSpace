@@ -1,0 +1,21 @@
+﻿@model TradeSpace.Models.ViewModels.LoginViewModel
+@{ ViewData["Title"] = "Вхід"; }
+
+<div class="container mt-5" style="max-width: 500px;">
+    <h2 class="mb-4">Вхід</h2>
+    <form asp-action="Login" method="post" class="card p-4 shadow-sm">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+        <div class="mb-4">
+            <label asp-for="Password" class="form-label">Пароль</label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Увійти</button>
+    </form>
+</div>

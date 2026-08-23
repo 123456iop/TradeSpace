@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using TradeSpace.Data;
 using TradeSpace.Services;
@@ -29,6 +30,13 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Підключаємо авторизацію через Cookie
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Home/Error";
+    });
 
 // ==========================================
 // 2. ЗБОРКА ДОДАТКУ
@@ -57,6 +65,7 @@ app.UseRouting();
 
 app.UseSession();
 
+// Додано middleware для авторизації
 app.UseAuthentication();
 app.UseAuthorization();
 
