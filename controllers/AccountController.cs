@@ -9,29 +9,33 @@ using Microsoft.EntityFrameworkCore;
 using TradeSpace.Data;
 using TradeSpace.Models;
 using TradeSpace.Models.ViewModels;
+using TradeSpace.Services;
 
 namespace TradeSpace.Controllers;
 
+[Authorize]
 public class AccountController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly IOrderService _orderService;
 
-    public AccountController(ApplicationDbContext context)
+    public AccountController(ApplicationDbContext context, IOrderService orderService)
     {
         _context = context;
+        _orderService = orderService;
     }
 
-    // 1. РЕЄСТРАЦІЯ
+    [AllowAnonymous]
     [HttpGet]
     public IActionResult Register() => View();
 
+    [AllowAnonymous]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (ModelState.IsValid)
         {
-            // Перевіряємо, чи немає вже такого Email
             if (await _context.Users.AnyAsync(u => u.Email == model.Email))
             {
                 ModelState.AddModelError("Email", "Цей Email вже зайнятий.");
@@ -49,16 +53,17 @@ public class AccountController : Controller
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            await Authenticate(user); // Автоматично логінимо після реєстрації
+            await Authenticate(user);
             return RedirectToAction("Index", "Products");
         }
         return View(model);
     }
 
-    // 2. ВХІД
+    [AllowAnonymous]
     [HttpGet]
     public IActionResult Login() => View();
 
+    [AllowAnonymous]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
@@ -66,8 +71,6 @@ public class AccountController : Controller
         if (ModelState.IsValid)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
-            
-            // Перевіряємо юзера та збіг кешів паролів
             if (user != null && user.PasswordHash == HashPassword(model.Password))
             {
                 await Authenticate(user);
@@ -78,38 +81,109 @@ public class AccountController : Controller
         return View(model);
     }
 
-    // 3. ВИХІД
     [HttpPost]
-    [Authorize] // Тільки для авторизованих
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Products");
     }
 
-    // 4. ОСОБИСТИЙ КАБІНЕТ
+    // ГОЛОВНА СТОРІНКА КАБІНЕТУ
     [HttpGet]
-    [Authorize]
     public async Task<IActionResult> Index()
     {
-        // Отримуємо ID поточного користувача з його Cookie
-        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        if (Guid.TryParse(userIdStr, out Guid userId))
-        {
-            // Завантажуємо юзера разом з його замовленнями
-            var user = await _context.Users
-                .Include(u => u.Orders)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-                
-            return View(user);
-        }
-        return RedirectToAction("Login");
+        var userId = GetCurrentUserId();
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null) return RedirectToAction("Login");
+
+        ViewBag.Orders = await _orderService.GetUserOrdersAsync(userId);
+        return View(user);
     }
 
-    // --- ДОПОМІЖНІ МЕТОДИ ---
+    // РЕДАГУВАННЯ ПРОФІЛЮ
+    [HttpGet]
+    public async Task<IActionResult> EditProfile()
+    {
+        var userId = GetCurrentUserId();
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return NotFound();
 
-    // Створення Cookie-сесії для користувача
+        var model = new EditProfileViewModel
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditProfile(EditProfileViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        var userId = GetCurrentUserId();
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return NotFound();
+
+        user.FirstName = model.FirstName;
+        user.LastName = model.LastName;
+        user.PhoneNumber = model.PhoneNumber;
+
+        await _context.SaveChangesAsync();
+        TempData["SuccessMessage"] = "Профіль успішно оновлено!";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // ЗМІНА ПАРОЛЯ
+    [HttpGet]
+    public IActionResult ChangePassword() => View();
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+
+        var userId = GetCurrentUserId();
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return NotFound();
+
+        if (user.PasswordHash != HashPassword(model.OldPassword))
+        {
+            ModelState.AddModelError("OldPassword", "Старий пароль вказано невірно.");
+            return View(model);
+        }
+
+        user.PasswordHash = HashPassword(model.NewPassword);
+        await _context.SaveChangesAsync();
+
+        TempData["SuccessMessage"] = "Пароль успішно змінено!";
+        return RedirectToAction(nameof(Index));
+    }
+
+    // ДЕТАЛІ ЗАМОВЛЕННЯ
+    [HttpGet]
+    public async Task<IActionResult> OrderDetail(Guid id)
+    {
+        var userId = GetCurrentUserId();
+        var order = await _orderService.GetOrderByIdAsync(id, userId);
+
+        if (order == null) return NotFound();
+
+        return View(order);
+    }
+
+    private Guid GetCurrentUserId()
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(userIdStr, out Guid userId) ? userId : Guid.Empty;
+    }
+
     private async Task Authenticate(User user)
     {
         var claims = new List<Claim>
@@ -123,7 +197,6 @@ public class AccountController : Controller
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
     }
 
-    // Простий кешер паролів
     private string HashPassword(string password)
     {
         using var sha256 = SHA256.Create();

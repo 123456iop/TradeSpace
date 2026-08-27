@@ -34,3 +34,32 @@ public class LoginViewModel
     [DataType(DataType.Password)]
     public string Password { get; set; } = string.Empty;
 }
+
+public class EditProfileViewModel
+{
+    [Required(ErrorMessage = "Введіть ім'я")]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Введіть прізвище")]
+    public string LastName { get; set; } = string.Empty;
+
+    [Phone(ErrorMessage = "Некоректний номер телефону")]
+    public string? PhoneNumber { get; set; }
+}
+
+public class ChangePasswordViewModel
+{
+    [Required(ErrorMessage = "Введіть поточний пароль")]
+    [DataType(DataType.Password)]
+    public string OldPassword { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Введіть новий пароль")]
+    [DataType(DataType.Password)]
+    [MinLength(6, ErrorMessage = "Мінімум 6 символів")]
+    public string NewPassword { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Підтвердіть новий пароль")]
+    [DataType(DataType.Password)]
+    [Compare("NewPassword", ErrorMessage = "Паролі не співпадають")]
+    public string ConfirmPassword { get; set; } = string.Empty;
+}

@@ -1,10 +1,21 @@
 ﻿@model TradeSpace.Models.User
-@{ ViewData["Title"] = "Особистий кабінет"; }
+@{
+    ViewData["Title"] = "Особистий кабінет";
+    var orders = ViewBag.Orders as List<TradeSpace.Models.Order> ?? new List<TradeSpace.Models.Order>();
+}
 
 <div class="container mt-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
     <h1 class="mb-4">Привіт, @Model.FirstName!</h1>
 
     <div class="row">
+        <!-- Блок профілю -->
         <div class="col-md-4">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
@@ -13,28 +24,76 @@
                 <div class="card-body">
                     <p><strong>Ім'я:</strong> @Model.FirstName @Model.LastName</p>
                     <p><strong>Email:</strong> @Model.Email</p>
-                    <p><strong>Дата реєстрації:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
+                    <p><strong>Телефон:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Не вказано" : Model.PhoneNumber)</p>
+                    <p><strong>Реєстрація:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
+                    
+                    <hr />
+                    <div class="d-grid gap-2">
+                        <a asp-action="EditProfile" class="btn btn-outline-primary btn-sm">Редагувати профіль</a>
+                        <a asp-action="ChangePassword" class="btn btn-outline-secondary btn-sm">Змінити пароль</a>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Історія замовлень -->
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-secondary text-white">
                     <h5 class="mb-0">Історія замовлень</h5>
                 </div>
                 <div class="card-body">
-                    @if (Model.Orders.Any())
+                    @if (orders.Any())
                     {
-                        <ul class="list-group list-group-flush">
-                            @foreach (var order in Model.Orders.OrderByDescending(o => o.CreatedAt))
-                            {
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Замовлення від @order.CreatedAt.ToString("dd.MM.yyyy")</span>
-                                    <span class="badge bg-success rounded-pill">@order.TotalAmount.ToString("C")</span>
-                                </li>
-                            }
-                        </ul>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>№ Замовлення</th>
+                                        <th>Дата</th>
+                                        <th>Сума</th>
+                                        <th>Статус</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in orders)
+                                    {
+                                        <tr>
+                                            <td><small class="text-muted">#@order.Id.ToString().Substring(0, 8)</small></td>
+                                            <td>@order.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                            <td><strong>@order.TotalAmount.ToString("C")</strong></td>
+                                            <td>
+                                                @switch (order.Status)
+                                                {
+                                                    case TradeSpace.Models.OrderStatus.Pending:
+                                                        <span class="badge bg-warning text-dark">Очікує</span>
+                                                        break;
+                                                    case TradeSpace.Models.OrderStatus.Paid:
+                                                        <span class="badge bg-info">Оплачено</span>
+                                                        break;
+                                                    case TradeSpace.Models.OrderStatus.Shipped:
+                                                        <span class="badge bg-primary">Відправлено</span>
+                                                        break;
+                                                    case TradeSpace.Models.OrderStatus.Delivered:
+                                                        <span class="badge bg-success">Доставлено</span>
+                                                        break;
+                                                    case TradeSpace.Models.OrderStatus.Cancelled:
+                                                        <span class="badge bg-danger">Скасовано</span>
+                                                        break;
+                                                    default:
+                                                        <span class="badge bg-secondary">@order.Status</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                <a asp-action="OrderDetail" asp-route-id="@order.Id" class="btn btn-sm btn-outline-dark">Деталі</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     }
                     else
                     {

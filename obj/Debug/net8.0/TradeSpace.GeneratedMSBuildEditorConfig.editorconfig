@@ -20,12 +20,24 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/zenai/Downloads/TradeSpace/views/account/ChangePassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWNjb3VudFxDaGFuZ2VQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/zenai/Downloads/TradeSpace/views/account/EditProfile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWNjb3VudFxFZGl0UHJvZmlsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/zenai/Downloads/TradeSpace/views/account/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWNjb3VudFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/zenai/Downloads/TradeSpace/views/account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWNjb3VudFxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/zenai/Downloads/TradeSpace/views/account/OrderDetail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWNjb3VudFxPcmRlckRldGFpbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/zenai/Downloads/TradeSpace/views/account/Register.cshtml]
