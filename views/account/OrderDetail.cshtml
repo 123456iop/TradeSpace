@@ -1,0 +1,57 @@
+﻿@model TradeSpace.Models.Order
+@{ ViewData["Title"] = "Деталі замовлення"; }
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Замовлення #@Model.Id.ToString().Substring(0, 8)</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">Повернутися в кабінет</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Товари у замовленні</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Товар</th>
+                                <th>Ціна</th>
+                                <th>Кількість</th>
+                                <th>Сума</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@(item.Product?.Title ?? "Товар видалено")</td>
+                                    <td>@item.PriceAtPurchase.ToString("C")</td>
+                                    <td>@item.Quantity</td>
+                                    <td><strong>@((item.PriceAtPurchase * item.Quantity).ToString("C"))</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Інформація</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Дата створення:</strong><br />@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+                    <p><strong>Адреса доставки:</strong><br />@Model.ShippingAddress</p>
+                    <p><strong>Статус:</strong><br /><span class="badge bg-info">@Model.Status</span></p>
+                    <hr />
+                    <h4>Загальна сума: <span class="text-success">@Model.TotalAmount.ToString("C")</span></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

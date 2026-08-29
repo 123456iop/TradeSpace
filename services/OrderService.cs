@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,26 @@ namespace TradeSpace.Services
             await _cartService.ClearCartAsync(cart.Id);
 
             return order;
+        }
+
+        // --- НОВІ МЕТОДИ ДЛЯ ОСОБИСТОГО КАБІНЕТУ ---
+
+        public async Task<List<Order>> GetUserOrdersAsync(Guid userId)
+        {
+            return await _context.Orders
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Product)
+                .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<Order?> GetOrderByIdAsync(Guid orderId, Guid userId)
+        {
+            return await _context.Orders
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
         }
     }
 }
