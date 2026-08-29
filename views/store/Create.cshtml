@@ -1,0 +1,36 @@
+﻿@model TradeSpace.Models.ViewModels.CreateStoreViewModel
+
+@{
+    ViewData["Title"] = "Створення магазину";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <h2 class="mb-4">Створити власний магазин</h2>
+
+    <form asp-action="Create" method="post" class="card shadow-sm p-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">Назва магазину</label>
+            <input asp-for="Name" class="form-control" placeholder="Наприклад: My Store" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Опис магазину</label>
+            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Опишіть ваші товари..."></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="LogoUrl" class="form-label">URL логотипу (необов'язково)</label>
+            <input asp-for="LogoUrl" class="form-control" placeholder="https://example.com/logo.png" />
+            <span asp-validation-for="LogoUrl" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a asp-controller="Account" asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+            <button type="submit" class="btn btn-success">Створити магазин</button>
+        </div>
+    </form>
+</div>

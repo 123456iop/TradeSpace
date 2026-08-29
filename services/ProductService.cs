@@ -17,7 +17,6 @@ namespace TradeSpace.Services
             _context = context;
         }
 
-        // Оновлений метод із підтримкою пошуку, категорії та пагінації
         public async Task<(IEnumerable<Product> Products, int TotalPages)> GetFilteredProductsAsync(
             string? searchString, Guid? categoryId, int pageNumber, int pageSize)
         {
@@ -28,24 +27,21 @@ namespace TradeSpace.Services
                 .Include(p => p.Store)
                 .AsQueryable();
 
-            // Фільтрація за пошуковим запитом
             if (!string.IsNullOrWhiteSpace(searchString))
             {
                 query = query.Where(p => p.Title.Contains(searchString) || (p.Description != null && p.Description.Contains(searchString)));
             }
 
-            // Фільтрація за категорією
             if (categoryId.HasValue && categoryId.Value != Guid.Empty)
             {
                 query = query.Where(p => p.CategoryId == categoryId.Value);
             }
 
-            // Рахуємо загальну кількість сторінок
             int totalItems = await query.CountAsync();
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            // Застосовуємо пагінацію
             var products = await query
+                .OrderByDescending(p => p.CreatedAt) // Обов'язково для Skip/Take
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -53,7 +49,6 @@ namespace TradeSpace.Services
             return (products, totalPages);
         }
 
-        // Залишаємо старий метод для сумісності, якщо він десь ще використовується
         public async Task<IEnumerable<Product>> GetAllActiveProductsAsync()
         {
             return await _context.Products
@@ -61,6 +56,16 @@ namespace TradeSpace.Services
                 .Include(p => p.Images)
                 .Include(p => p.Category)
                 .Include(p => p.Store)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Product>> GetSellerProductsAsync(Guid storeId)
+        {
+            return await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Images)
+                .Where(p => p.StoreId == storeId)
+                .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
         }
 
@@ -78,6 +83,22 @@ namespace TradeSpace.Services
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
             return product;
+        }
+
+        public async Task UpdateProductAsync(Product product)
+        {
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteProductAsync(Guid id, Guid storeId)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id && p.StoreId == storeId);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<bool> UpdateStockAsync(Guid productId, int quantityChange)

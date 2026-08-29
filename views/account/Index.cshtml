@@ -1,47 +1,63 @@
 ﻿@model TradeSpace.Models.User
-@{ ViewData["Title"] = "Особистий кабінет"; }
 
-<div class="container mt-4">
-    <h1 class="mb-4">Привіт, @Model.FirstName!</h1>
+@{
+    ViewData["Title"] = "Личный кабинет";
+}
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Мої дані</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Ім'я:</strong> @Model.FirstName @Model.LastName</p>
-                    <p><strong>Email:</strong> @Model.Email</p>
-                    <p><strong>Дата реєстрації:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">Історія замовлень</h5>
-                </div>
-                <div class="card-body">
-                    @if (Model.Orders.Any())
-                    {
-                        <ul class="list-group list-group-flush">
-                            @foreach (var order in Model.Orders.OrderByDescending(o => o.CreatedAt))
-                            {
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>Замовлення від @order.CreatedAt.ToString("dd.MM.yyyy")</span>
-                                    <span class="badge bg-success rounded-pill">@order.TotalAmount.ToString("C")</span>
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p class="text-muted mb-0">У вас ще немає замовлень.</p>
-                    }
-                </div>
-            </div>
-        </div>
+@if (Model == null)
+{
+    <div class="alert alert-danger">
+        Данные пользователя не найдены. Пожалуйста, войдите снова.
     </div>
-</div>
+}
+else
+{
+    <div class="container mt-4">
+        <h2>Личный кабинет</h2>
+        <hr />
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title">@Model.FirstName @Model.LastName</h4>
+                <p class="card-text"><strong>Email:</strong> @Model.Email</p>
+                <p class="card-text"><strong>Телефон:</strong> @(Model.PhoneNumber ?? "Не указан")</p>
+                <p class="card-text"><strong>Роль:</strong> @Model.Role</p>
+                <p class="card-text"><small class="text-muted">Зарегистрирован: @Model.CreatedAt.ToString("dd.MM.yyyy")</small></p>
+            </div>
+        </div>
+
+        <h3>Мои магазины</h3>
+        @if (Model.Stores != null && Model.Stores.Any())
+        {
+            <ul class="list-group mb-4">
+                @foreach (var store in Model.Stores)
+                {
+                    <li class="list-group-item">
+                        <strong>@store.Name</strong> — @store.Description
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">У вас пока нет созданных магазинов.</p>
+        }
+
+        <h3>Мои заказы</h3>
+        @if (Model.Orders != null && Model.Orders.Any())
+        {
+            <ul class="list-group">
+                @foreach (var order in Model.Orders)
+                {
+                    <li class="list-group-item">
+                        Заказ №@order.Id — Сумма: @order.TotalAmount | Статус: @order.Status
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted">История заказов пуста.</p>
+        }
+    </div>
+}

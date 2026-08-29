@@ -156,11 +156,17 @@ namespace TradeSpace.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("StockQuantity")
@@ -171,6 +177,7 @@ namespace TradeSpace.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -405,7 +412,7 @@ namespace TradeSpace.Migrations
             modelBuilder.Entity("TradeSpace.Models.Review", b =>
                 {
                     b.HasOne("TradeSpace.Models.Product", "Product")
-                        .WithMany("Reviews")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -452,8 +459,6 @@ namespace TradeSpace.Migrations
             modelBuilder.Entity("TradeSpace.Models.Product", b =>
                 {
                     b.Navigation("Images");
-
-                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("TradeSpace.Models.Store", b =>

@@ -1,27 +1,20 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using TradeSpace.Data;
+using TradeSpace.Models;
 using TradeSpace.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ==========================================
-// 1. РЕЄСТРАЦІЯ СЕРВІСІВ (DEPENDENCY INJECTION)
-// ==========================================
-
-// Підключення підтримки MVC (Контролери + Razor Views)
 builder.Services.AddControllersWithViews();
 
-// Налаштування Entity Framework Core з використанням ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=tradespace.db"));
 
-// Реєстрація сервісів бізнес-логіки
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-// Підключення сесій
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -30,7 +23,6 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Підключаємо авторизацію через Cookie
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -38,15 +30,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Home/Error";
     });
 
-// ==========================================
-// 2. ЗБОРКА ДОДАТКУ
-// ==========================================
 var app = builder.Build();
-
-
-// ==========================================
-// 3. НАЛАШТУВАННЯ MIDDLEWARE
-// ==========================================
 
 if (!app.Environment.IsDevelopment())
 {
@@ -65,17 +49,25 @@ app.UseRouting();
 
 app.UseSession();
 
-// Додано middleware для авторизації
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Дефолтний маршрут до стартової сторінки
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Products}/{action=Index}/{id?}");
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    context.Database.EnsureCreated();
+    
+    var adminUser = context.Users.FirstOrDefault(u => u.Email == "zenaigrokritik@gmail.com");
+    if (adminUser != null)
+    {
+        adminUser.Role = UserRole.Admin;
+        context.SaveChanges();
+    }
+}
 
-// ==========================================
-// 4. ЗАПУСК
-// ==========================================
 app.Run();

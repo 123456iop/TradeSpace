@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Панель Адміністратора";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Панель керування TradeSpace</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Користувачі</h5>
+                    <h2>@ViewBag.TotalUsers</h2>
+                    <a asp-action="Users" class="text-white text-decoration-underline">Керувати користувачами -></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Замовлення</h5>
+                    <h2>@ViewBag.TotalOrders</h2>
+                    <span class="text-dark">Керувати замовленнями</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Товари в системі</h5>
+                    <h2>@ViewBag.TotalProducts</h2>
+                    <a asp-controller="Products" asp-action="Index" class="text-white text-decoration-underline">Переглянути каталог -></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a asp-controller="Account" asp-action="Index" class="btn btn-outline-secondary">Повернутись до профілю</a>
+    </div>
+</div>

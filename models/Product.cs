@@ -1,39 +1,33 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TradeSpace.Models;
 
 public class Product
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+
+    [Required(ErrorMessage = "Назва обов'язкова")]
     public string Title { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Опис обов'язковий")]
     public string Description { get; set; } = string.Empty;
-    
-    [Precision(18, 2)]
+
+    [Required]
+    [Range(0.01, 1000000)]
     public decimal Price { get; set; }
-    
-    public int StockQuantity { get; set; } // Залишок на складі
+
+    public string? ImageUrl { get; set; }
+    public List<ProductImage> Images { get; set; } = new();
+
+    public int StockQuantity { get; set; } = 0;
     public bool IsActive { get; set; } = true;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    // Прив'язка до магазину
-    public Guid StoreId { get; set; }
-    public Store Store { get; set; } = null!;
-
-    // Прив'язка до категорії
+    [Required]
     public Guid CategoryId { get; set; }
-    public Category Category { get; set; } = null!;
+    public Category? Category { get; set; }
 
-    // Зображення і відгуки
-    public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
-    public ICollection<Review> Reviews { get; set; } = new List<Review>();
-}
+    public Guid StoreId { get; set; }
+    public Store? Store { get; set; }
 
-public class ProductImage
-{
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public string Url { get; set; } = string.Empty;
-    public bool IsMain { get; set; } = false; // Главная обложка товара
-
-    public Guid ProductId { get; set; }
-    public Product Product { get; set; } = null!;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

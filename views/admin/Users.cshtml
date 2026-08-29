@@ -1,0 +1,69 @@
+﻿@using TradeSpace.Models
+@model IEnumerable<TradeSpace.Models.User>
+
+@{
+    ViewData["Title"] = "Управління користувачами";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Управління користувачами</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">Назад до панелі</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Користувач</th>
+                            <th>Email</th>
+                            <th>Дата реєстрації</th>
+                            <th>Поточна роль</th>
+                            <th>Змінити роль</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@user.FirstName @user.LastName</strong>
+                                </td>
+                                <td>@user.Email</td>
+                                <td>@user.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>
+                                    @if (user.Role.ToString() == "Admin")
+                                    {
+                                        <span class="badge bg-danger">Admin</span>
+                                    }
+                                    else if (user.Role.ToString() == "Seller")
+                                    {
+                                        <span class="badge bg-success">Seller</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Customer</span>
+                                    }
+                                </td>
+                                <td>
+                                    <form asp-action="ChangeRole" method="post" class="d-flex gap-2" style="max-width: 260px;">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <select name="newRole" class="form-select form-select-sm">
+                                            @foreach (UserRole role in Enum.GetValues(typeof(UserRole)))
+                                            {
+                                                <option value="@role" selected="@(role.ToString() == user.Role.ToString())">@role</option>
+                                            }
+                                        </select>
+                                        <button type="submit" class="btn btn-primary btn-sm">Зберегти</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
