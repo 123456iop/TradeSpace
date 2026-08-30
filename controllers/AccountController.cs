@@ -94,7 +94,6 @@ public class AccountController : Controller
             return RedirectToAction("Login");
         }
 
-        // Збережено логіку твого напарника для підвантаження магазинів
         var user = await _context.Users
             .Include(u => u.Stores)
             .Include(u => u.Orders)
@@ -114,7 +113,8 @@ public class AccountController : Controller
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.FirstName),
-            new Claim(ClaimTypes.Email, user.Email)
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
         var id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);

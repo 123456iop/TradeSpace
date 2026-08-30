@@ -22,6 +22,12 @@
             @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                 <a asp-controller="Account" asp-action="Index">Кабінет (@User.Identity.Name)</a>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Admin" asp-action="Index">Адмін-панель</a>
+                }
+
                 <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
                     <button type="submit" style="background:none; border:none; cursor:pointer; color:inherit; font:inherit; text-decoration:underline;">Вийти</button>
                 </form>
