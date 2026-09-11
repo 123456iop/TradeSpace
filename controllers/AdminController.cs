@@ -90,7 +90,7 @@ public class AdminController : Controller
         var ticket = await _context.SupportTickets
             .Include(t => t.User)
             .Include(t => t.Messages)
-            .ThenInclude(m => m.Sender) // Используем Sender согласно модели TicketMessage[cite: 7]
+            .ThenInclude(m => m.Sender) // Використовуємо Sender згідно з моделлю TicketMessage
             .FirstOrDefaultAsync(t => t.Id == id);
 
         if (ticket == null) return NotFound();
@@ -106,9 +106,9 @@ public class AdminController : Controller
             var ticketMessage = new TicketMessage
             {
                 TicketId = ticketId,
-                SenderId = GetCurrentUserId(), // Используем SenderId[cite: 7]
+                SenderId = GetCurrentUserId(), // Використовуємо SenderId
                 Text = message,
-                SentAt = DateTime.UtcNow // Используем SentAt[cite: 7]
+                SentAt = DateTime.UtcNow // Використовуємо SentAt
             };
 
             _context.TicketMessages.Add(ticketMessage);
