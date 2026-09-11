@@ -35,18 +35,6 @@ public class LoginViewModel
     public string Password { get; set; } = string.Empty;
 }
 
-public class EditProfileViewModel
-{
-    [Required(ErrorMessage = "Введіть ім'я")]
-    public string FirstName { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "Введіть прізвище")]
-    public string LastName { get; set; } = string.Empty;
-
-    [Phone(ErrorMessage = "Некоректний номер телефону")]
-    public string? PhoneNumber { get; set; }
-}
-
 public class ChangePasswordViewModel
 {
     [Required(ErrorMessage = "Введіть поточний пароль")]

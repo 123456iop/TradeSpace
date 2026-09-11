@@ -28,8 +28,7 @@ namespace TradeSpace.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Carts");
                 });
@@ -162,10 +161,6 @@ namespace TradeSpace.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
@@ -177,7 +172,6 @@ namespace TradeSpace.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -268,10 +262,66 @@ namespace TradeSpace.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Stores");
+                });
+
+            modelBuilder.Entity("TradeSpace.Models.SupportTicket", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsClosed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SupportTickets");
+                });
+
+            modelBuilder.Entity("TradeSpace.Models.TicketMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("TicketId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("TicketId");
+
+                    b.ToTable("TicketMessages");
                 });
 
             modelBuilder.Entity("TradeSpace.Models.User", b =>
@@ -295,6 +345,9 @@ namespace TradeSpace.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("NameLastChangedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -313,8 +366,8 @@ namespace TradeSpace.Migrations
             modelBuilder.Entity("TradeSpace.Models.Cart", b =>
                 {
                     b.HasOne("TradeSpace.Models.User", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("TradeSpace.Models.Cart", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -352,7 +405,7 @@ namespace TradeSpace.Migrations
             modelBuilder.Entity("TradeSpace.Models.Order", b =>
                 {
                     b.HasOne("TradeSpace.Models.User", "User")
-                        .WithMany("Orders")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -418,7 +471,7 @@ namespace TradeSpace.Migrations
                         .IsRequired();
 
                     b.HasOne("TradeSpace.Models.User", "User")
-                        .WithMany("Reviews")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -431,12 +484,42 @@ namespace TradeSpace.Migrations
             modelBuilder.Entity("TradeSpace.Models.Store", b =>
                 {
                     b.HasOne("TradeSpace.Models.User", "User")
-                        .WithOne("Store")
-                        .HasForeignKey("TradeSpace.Models.Store", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TradeSpace.Models.SupportTicket", b =>
+                {
+                    b.HasOne("TradeSpace.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TradeSpace.Models.TicketMessage", b =>
+                {
+                    b.HasOne("TradeSpace.Models.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TradeSpace.Models.SupportTicket", "Ticket")
+                        .WithMany("Messages")
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sender");
+
+                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("TradeSpace.Models.Cart", b =>
@@ -466,15 +549,9 @@ namespace TradeSpace.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("TradeSpace.Models.User", b =>
+            modelBuilder.Entity("TradeSpace.Models.SupportTicket", b =>
                 {
-                    b.Navigation("Cart");
-
-                    b.Navigation("Orders");
-
-                    b.Navigation("Reviews");
-
-                    b.Navigation("Store");
+                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }

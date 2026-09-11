@@ -1,0 +1,18 @@
+﻿@{ ViewData["Title"] = "Новое обращение"; }
+
+<div class="container mt-4" style="max-width: 600px;">
+    <h2>Связь с администрацией</h2>
+
+    <form asp-action="Create" method="post">
+        <div class="mb-3">
+            <label class="form-label">Тема</label>
+            <input type="text" name="subject" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Сообщение</label>
+            <textarea name="message" class="form-control" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Отправить</button>
+        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+    </form>
+</div>

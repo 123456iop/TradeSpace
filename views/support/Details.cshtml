@@ -1,0 +1,32 @@
+﻿@model TradeSpace.Models.SupportTicket
+@{ ViewData["Title"] = "Чат с поддержкой"; }
+
+<div class="container mt-4" style="max-width: 700px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Тема: @Model.Subject</h3>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Назад к списку</a>
+    </div>
+
+    <div class="card p-3 mb-3" style="max-height: 500px; overflow-y: auto;">
+        @foreach (var msg in Model.Messages.OrderBy(m => m.SentAt))
+        {
+            var isMe = msg.SenderId.ToString() == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            <div class="d-flex flex-column mb-3 @(isMe ? "align-items-end" : "align-items-start")">
+                <div class="p-2 rounded text-white @(isMe ? "bg-primary" : "bg-secondary")" style="max-width: 80%;">
+                    <small class="d-block fw-bold border-bottom pb-1 mb-1">
+                        @msg.Sender?.FirstName (@msg.SentAt.ToString("HH:mm, dd.MM.yyyy"))
+                    </small>
+                    <div>@msg.Text</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <form asp-action="SendMessage" method="post">
+        <input type="hidden" name="ticketId" value="@Model.Id" />
+        <div class="input-group">
+            <input type="text" name="text" class="form-control" placeholder="Введите сообщение..." required autocomplete="off" />
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </div>
+    </form>
+</div>

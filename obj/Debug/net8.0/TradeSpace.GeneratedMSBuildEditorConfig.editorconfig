@@ -23,12 +23,24 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/PC/RiderProjects/TradeSpace/views/account/ChangePassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWNjb3VudFxDaGFuZ2VQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/RiderProjects/TradeSpace/views/account/EditProfile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWNjb3VudFxFZGl0UHJvZmlsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/PC/RiderProjects/TradeSpace/views/account/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWNjb3VudFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/PC/RiderProjects/TradeSpace/views/account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWNjb3VudFxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/RiderProjects/TradeSpace/views/account/OrderDetail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWNjb3VudFxPcmRlckRldGFpbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/PC/RiderProjects/TradeSpace/views/account/Register.cshtml]
@@ -39,20 +51,28 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWRtaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/PC/RiderProjects/TradeSpace/views/admin/TicketDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWRtaW5cVGlja2V0RGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/RiderProjects/TradeSpace/views/admin/Tickets.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWRtaW5cVGlja2V0cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/PC/RiderProjects/TradeSpace/views/admin/Users.cshtml]
 build_metadata.AdditionalFiles.TargetPath = dmlld3NcYWRtaW5cVXNlcnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/PC/RiderProjects/TradeSpace/views/Cart/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = dmlld3NcQ2FydFxJbmRleC5jc2h0bWw=
+[C:/Users/PC/RiderProjects/TradeSpace/views/cart/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3NcY2FydFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/PC/RiderProjects/TradeSpace/views/Orders/Checkout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = dmlld3NcT3JkZXJzXENoZWNrb3V0LmNzaHRtbA==
+[C:/Users/PC/RiderProjects/TradeSpace/views/orders/Checkout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3Ncb3JkZXJzXENoZWNrb3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/PC/RiderProjects/TradeSpace/views/Orders/Success.cshtml]
-build_metadata.AdditionalFiles.TargetPath = dmlld3NcT3JkZXJzXFN1Y2Nlc3MuY3NodG1s
+[C:/Users/PC/RiderProjects/TradeSpace/views/orders/Success.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3Ncb3JkZXJzXFN1Y2Nlc3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/PC/RiderProjects/TradeSpace/views/products/Create.cshtml]
@@ -81,6 +101,18 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/PC/RiderProjects/TradeSpace/views/store/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = dmlld3Ncc3RvcmVcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/RiderProjects/TradeSpace/views/support/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3Ncc3VwcG9ydFxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/RiderProjects/TradeSpace/views/support/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3Ncc3VwcG9ydFxEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/PC/RiderProjects/TradeSpace/views/support/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld3Ncc3VwcG9ydFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/PC/RiderProjects/TradeSpace/views/_ViewImports.cshtml]

@@ -8,7 +8,8 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Управління користувачами</h2>
-        <a asp-action="Index" class="btn btn-outline-secondary">Назад до панелі</a>
+        <!-- Кнопка тепер веде назад в кабінет -->
+        <a asp-controller="Account" asp-action="Index" class="btn btn-outline-secondary">Назад до кабінету</a>
     </div>
 
     <div class="card shadow-sm">
@@ -22,6 +23,7 @@
                             <th>Дата реєстрації</th>
                             <th>Поточна роль</th>
                             <th>Змінити роль</th>
+                            <th>Дії</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,10 +55,23 @@
                                         <select name="newRole" class="form-select form-select-sm">
                                             @foreach (UserRole role in Enum.GetValues(typeof(UserRole)))
                                             {
-                                                <option value="@role" selected="@(role.ToString() == user.Role.ToString())">@role</option>
+                                                if (role.ToString() == user.Role.ToString())
+                                                {
+                                                    <option value="@role" selected="selected">@role</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@role">@role</option>
+                                                }
                                             }
                                         </select>
                                         <button type="submit" class="btn btn-primary btn-sm">Зберегти</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form asp-action="DeleteUser" method="post" onsubmit="return confirm('Ви впевнені, що хочете видалити цього користувача?');">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Видалити</button>
                                     </form>
                                 </td>
                             </tr>
