@@ -1,0 +1,47 @@
+﻿@model IEnumerable<TradeSpace.Models.SupportTicket>
+
+@{
+    ViewData["Title"] = "Управління тикетами";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Всі звернення підтримки</h2>
+        <a asp-controller="Account" asp-action="Index" class="btn btn-outline-secondary">Назад до кабінету</a>
+    </div>
+
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>Користувач</th>
+            <th>Тема</th>
+            <th>Дата створення</th>
+            <th>Статус</th>
+            <th>Дії</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var ticket in Model)
+        {
+            <tr>
+                <td>@ticket.User?.Email</td>
+                <td>@ticket.Subject</td>
+                <td>@ticket.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>
+                    @if(ticket.IsClosed) 
+                    { 
+                        <span class="badge bg-secondary">Закрито</span> 
+                    }
+                    else 
+                    { 
+                        <span class="badge bg-success">Відкрито</span> 
+                    }
+                </td>
+                <td>
+                    <a asp-action="TicketDetails" asp-route-id="@ticket.Id" class="btn btn-sm btn-primary">Відповісти</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

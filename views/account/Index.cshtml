@@ -1,63 +1,57 @@
 ﻿@model TradeSpace.Models.User
+@using TradeSpace.Models
 
 @{
     ViewData["Title"] = "Личный кабинет";
 }
 
-@if (Model == null)
-{
-    <div class="alert alert-danger">
-        Данные пользователя не найдены. Пожалуйста, войдите снова.
-    </div>
-}
-else
-{
-    <div class="container mt-4">
-        <h2>Личный кабинет</h2>
-        <hr />
+<div class="container mt-4">
+    <h2>Личный кабинет</h2>
+    <hr />
 
-        <div class="card mb-4">
-            <div class="card-body">
-                <h4 class="card-title">@Model.FirstName @Model.LastName</h4>
-                <p class="card-text"><strong>Email:</strong> @Model.Email</p>
-                <p class="card-text"><strong>Телефон:</strong> @(Model.PhoneNumber ?? "Не указан")</p>
-                <p class="card-text"><strong>Роль:</strong> @Model.Role</p>
-                <p class="card-text"><small class="text-muted">Зарегистрирован: @Model.CreatedAt.ToString("dd.MM.yyyy")</small></p>
-            </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
         </div>
+    }
 
-        <h3>Мои магазины</h3>
-        @if (Model.Stores != null && Model.Stores.Any())
-        {
-            <ul class="list-group mb-4">
-                @foreach (var store in Model.Stores)
-                {
-                    <li class="list-group-item">
-                        <strong>@store.Name</strong> — @store.Description
-                    </li>
-                }
-            </ul>
-        }
-        else
-        {
-            <p class="text-muted">У вас пока нет созданных магазинов.</p>
-        }
+    <div class="mb-4">
+        <h4><strong>@Model.FirstName @Model.LastName</strong></h4>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Номер телефону:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Не вказано" : Model.PhoneNumber)</p>
+        <p><strong>Роль:</strong> @Model.Role</p>
+        <p><strong>Зарегистрирован:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
 
-        <h3>Мои заказы</h3>
-        @if (Model.Orders != null && Model.Orders.Any())
-        {
-            <ul class="list-group">
-                @foreach (var order in Model.Orders)
-                {
-                    <li class="list-group-item">
-                        Заказ №@order.Id — Сумма: @order.TotalAmount | Статус: @order.Status
-                    </li>
-                }
-            </ul>
-        }
-        else
-        {
-            <p class="text-muted">История заказов пуста.</p>
-        }
+        <div class="mt-3">
+            <a asp-action="EditProfile" class="btn btn-outline-primary btn-sm">Изменить имя</a>
+            <a asp-action="ChangePassword" class="btn btn-outline-secondary btn-sm">Изменить пароль</a>
+
+            @if (Model.Role == UserRole.Admin)
+            {
+                <a asp-controller="Admin" asp-action="Users" class="btn btn-danger btn-sm ms-2">Управление пользователями</a>
+            }
+            else
+            {
+                <a asp-controller="Support" asp-action="Index" class="btn btn-outline-info btn-sm ms-2">Поддержка (Чат с админом)</a>
+            }
+            @if (Model.Role == UserRole.Admin)
+            {
+                <a asp-controller="Admin" asp-action="Users" class="btn btn-danger btn-sm ms-2">Управління користувачами</a>
+                <a asp-controller="Admin" asp-action="Tickets" class="btn btn-warning btn-sm ms-2">Всі тикети</a>
+            }
+        </div>
     </div>
-}
+
+    <hr />
+
+    <div class="mb-4">
+        <h4>Мои магазины</h4>
+        <p class="text-muted">У вас пока нет созданных магазинов.</p>
+    </div>
+
+    <div class="mb-4">
+        <h4>Мои заказы</h4>
+        <p class="text-muted">История заказов пуста.</p>
+    </div>
+</div>

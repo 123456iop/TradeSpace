@@ -1,6 +1,7 @@
-﻿using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -22,109 +23,188 @@ public class AccountController : Controller
         _context = context;
     }
 
-    [AllowAnonymous]
-    [HttpGet]
-    public IActionResult Register() => View();
-
-    [AllowAnonymous]
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel model)
+    private Guid GetCurrentUserId()
     {
-        if (ModelState.IsValid)
-        {
-            if (await _context.Users.AnyAsync(u => u.Email == model.Email))
-            {
-                ModelState.AddModelError("Email", "Цей Email вже зайнятий.");
-                return View(model);
-            }
-
-            var user = new User
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                PasswordHash = HashPassword(model.Password)
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            await Authenticate(user);
-            return RedirectToAction("Index", "Products");
-        }
-        return View(model);
-    }
-
-    [AllowAnonymous]
-    [HttpGet]
-    public IActionResult Login() => View();
-
-    [AllowAnonymous]
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel model)
-    {
-        if (ModelState.IsValid)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
-            if (user != null && user.PasswordHash == HashPassword(model.Password))
-            {
-                await Authenticate(user);
-                return RedirectToAction("Index", "Products");
-            }
-            ModelState.AddModelError("", "Невірний Email або пароль");
-        }
-        return View(model);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Logout()
-    {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return RedirectToAction("Index", "Products");
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return Guid.TryParse(idClaim, out var id) ? id : Guid.Empty;
     }
 
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdClaim, out var userId))
-        {
-            return RedirectToAction("Login");
-        }
-
-        // Збережено логіку твого напарника для підвантаження магазинів
-        var user = await _context.Users
-            .Include(u => u.Stores)
-            .Include(u => u.Orders)
-            .FirstOrDefaultAsync(u => u.Id == userId);
-
-        if (user == null)
-        {
-            return RedirectToAction("Login");
-        }
-
+        var user = await _context.Users.FindAsync(GetCurrentUserId());
+        if (user == null) return RedirectToAction(nameof(Login));
         return View(user);
     }
 
-    private async Task Authenticate(User user)
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult Register()
     {
+        if (User.Identity?.IsAuthenticated == true)
+            return RedirectToAction(nameof(Index));
+
+        return View();
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        if (await _context.Users.AnyAsync(u => u.Email == model.Email))
+        {
+            ModelState.AddModelError("Email", "Користувач з таким Email вже існує.");
+            return View(model);
+        }
+
+        var user = new User
+        {
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            Email = model.Email,
+            PasswordHash = model.Password,
+            Role = UserRole.Customer,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Login));
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult Login()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+            return RedirectToAction(nameof(Index));
+
+        return View();
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Login(LoginViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.PasswordHash == model.Password);
+        if (user == null)
+        {
+            ModelState.AddModelError("", "Невірна пошта або пароль.");
+            return View(model);
+        }
+
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.FirstName),
-            new Claim(ClaimTypes.Email, user.Email)
+            new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
-        var id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity));
+
+        return RedirectToAction(nameof(Index));
     }
 
-    private string HashPassword(string password)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
     {
-        using var sha256 = SHA256.Create();
-        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return Convert.ToBase64String(bytes);
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToAction("Login", "Account");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditProfile()
+    {
+        var user = await _context.Users.FindAsync(GetCurrentUserId());
+        if (user == null) return RedirectToAction(nameof(Login));
+
+        var model = new EditProfileViewModel
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PhoneNumber = user.PhoneNumber
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditProfile(EditProfileViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var user = await _context.Users.FindAsync(GetCurrentUserId());
+        if (user == null) return RedirectToAction(nameof(Login));
+
+        bool nameChanged = user.FirstName != model.FirstName || user.LastName != model.LastName;
+
+        if (nameChanged)
+        {
+            if (user.NameLastChangedAt.HasValue && user.NameLastChangedAt.Value.AddDays(30) > DateTime.UtcNow)
+            {
+                var nextDate = user.NameLastChangedAt.Value.AddDays(30);
+                ModelState.AddModelError("", $"Ім'я можна змінювати лише раз на 30 днів. Наступна зміна доступна з {nextDate:dd.MM.yyyy}.");
+                return View(model);
+            }
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.NameLastChangedAt = DateTime.UtcNow;
+        }
+
+        user.PhoneNumber = model.PhoneNumber;
+
+        await _context.SaveChangesAsync();
+        TempData["SuccessMessage"] = "Профіль успішно оновлено.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public IActionResult ChangePassword()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+    {
+        if (newPassword != confirmPassword)
+        {
+            ModelState.AddModelError("", "Нові паролі не збігаються.");
+            return View();
+        }
+
+        var user = await _context.Users.FindAsync(GetCurrentUserId());
+        if (user == null) return RedirectToAction(nameof(Login));
+
+        if (user.PasswordHash != currentPassword)
+        {
+            ModelState.AddModelError("", "Невірний поточний пароль.");
+            return View();
+        }
+
+        user.PasswordHash = newPassword;
+        await _context.SaveChangesAsync();
+
+        TempData["SuccessMessage"] = "Пароль успішно змінено.";
+        return RedirectToAction(nameof(Index));
     }
 }
