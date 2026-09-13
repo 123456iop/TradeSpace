@@ -2,11 +2,11 @@
 @using TradeSpace.Models
 
 @{
-    ViewData["Title"] = "Особистий кабінет";
+    ViewData["Title"] = "Личный кабинет";
 }
 
 <div class="container mt-4">
-    <h2>Особистий кабінет</h2>
+    <h2>Личный кабинет</h2>
     <hr />
 
     @if (TempData["SuccessMessage"] != null)
@@ -21,24 +21,24 @@
         <p><strong>Email:</strong> @Model.Email</p>
         <p><strong>Номер телефону:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Не вказано" : Model.PhoneNumber)</p>
         <p><strong>Роль:</strong> @Model.Role</p>
-        <p><strong>Зареєстрований:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
+        <p><strong>Зарегистрирован:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
 
         <div class="mt-3">
-            <a asp-action="EditProfile" class="btn btn-outline-primary btn-sm">Змінити ім'я</a>
-            <a asp-action="ChangePassword" class="btn btn-outline-secondary btn-sm">Змінити пароль</a>
+            <a asp-action="EditProfile" class="btn btn-outline-primary btn-sm">Изменить имя</a>
+            <a asp-action="ChangePassword" class="btn btn-outline-secondary btn-sm">Изменить пароль</a>
 
             @if (Model.Role == UserRole.Admin)
             {
-                <a asp-controller="Admin" asp-action="Users" class="btn btn-danger btn-sm ms-2">Управління користувачем</a>
+                <a asp-controller="Admin" asp-action="Users" class="btn btn-danger btn-sm ms-2">Управление пользователями</a>
             }
             else
             {
-                <a asp-controller="Support" asp-action="Index" class="btn btn-outline-info btn-sm ms-2">Підтримка (Чат с адміном)</a>
+                <a asp-controller="Support" asp-action="Index" class="btn btn-outline-info btn-sm ms-2">Поддержка (Чат с админом)</a>
             }
             @if (Model.Role == UserRole.Admin)
             {
                 <a asp-controller="Admin" asp-action="Users" class="btn btn-danger btn-sm ms-2">Управління користувачами</a>
-                <a asp-controller="Admin" asp-action="Tickets" class="btn btn-warning btn-sm ms-2">Всі тікети</a>
+                <a asp-controller="Admin" asp-action="Tickets" class="btn btn-warning btn-sm ms-2">Всі тикети</a>
             }
         </div>
     </div>
@@ -47,11 +47,11 @@
 
     <div class="mb-4">
         <h4>Мои магазины</h4>
-        <p class="text-muted">У вас поки що нема створених магазинів.</p>
+        <p class="text-muted">У вас пока нет созданных магазинов.</p>
     </div>
 
     <div class="mb-4">
-        <h4>Мої замовлення</h4>
-        <p class="text-muted">Історія заказів порожня.</p>
+        <h4>Мои заказы</h4>
+        <p class="text-muted">История заказов пуста.</p>
     </div>
 </div>
