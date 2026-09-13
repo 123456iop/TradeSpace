@@ -1,10 +1,10 @@
 ﻿@model TradeSpace.Models.SupportTicket
-@{ ViewData["Title"] = "Чат с поддержкой"; }
+@{ ViewData["Title"] = "Чат з підтримкою"; }
 
 <div class="container mt-4" style="max-width: 700px;">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3>Тема: @Model.Subject</h3>
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Назад к списку</a>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Назад до списку</a>
     </div>
 
     <div class="card p-3 mb-3" style="max-height: 500px; overflow-y: auto;">
@@ -25,8 +25,8 @@
     <form asp-action="SendMessage" method="post">
         <input type="hidden" name="ticketId" value="@Model.Id" />
         <div class="input-group">
-            <input type="text" name="text" class="form-control" placeholder="Введите сообщение..." required autocomplete="off" />
-            <button type="submit" class="btn btn-primary">Отправить</button>
+            <input type="text" name="text" class="form-control" placeholder="Введіть повідомлення..." required autocomplete="off" />
+            <button type="submit" class="btn btn-primary">Відправити</button>
         </div>
     </form>
 </div>

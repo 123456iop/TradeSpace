@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradeSpace.Data;
 
@@ -10,9 +11,11 @@ using TradeSpace.Data;
 namespace TradeSpace.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260911133622_SupportAndProfileUpdate")]
+    partial class SupportAndProfileUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
@@ -74,14 +77,9 @@ namespace TradeSpace.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("StoreId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ParentCategoryId");
-
-                    b.HasIndex("StoreId");
 
                     b.ToTable("Categories");
                 });
@@ -357,9 +355,6 @@ namespace TradeSpace.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Role")
                         .HasColumnType("INTEGER");
 
@@ -404,14 +399,7 @@ namespace TradeSpace.Migrations
                         .WithMany("SubCategories")
                         .HasForeignKey("ParentCategoryId");
 
-                    b.HasOne("TradeSpace.Models.Store", "Store")
-                        .WithMany()
-                        .HasForeignKey("StoreId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.Navigation("ParentCategory");
-
-                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("TradeSpace.Models.Order", b =>

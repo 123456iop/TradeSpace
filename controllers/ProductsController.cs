@@ -53,11 +53,55 @@ public class ProductsController : Controller
         return View(products ?? new List<Product>());
     }
 
+    // --- УПРАВЛІННЯ КАТЕГОРІЯМИ ---
+
+    [Authorize(Roles = "Seller,Admin")]
+    [HttpGet]
+    public IActionResult CreateCategory()
+    {
+        return View(new Category());
+    }
+
+    [Authorize(Roles = "Seller,Admin")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateCategory(Category category)
+    {
+        var store = await GetUserStoreAsync();
+        if (store == null) return RedirectToAction("Index", "Account");
+
+        // Прив'язуємо категорію до поточного магазину
+        category.StoreId = store.Id;
+
+        // Генеруємо Slug, якщо він порожній
+        if (string.IsNullOrWhiteSpace(category.Slug))
+        {
+            category.Slug = category.Name.ToLower().Replace(" ", "-");
+        }
+
+        ModelState.Remove(nameof(category.Store));
+        ModelState.Remove(nameof(category.ParentCategory));
+
+        if (!ModelState.IsValid)
+        {
+            return View(category);
+        }
+
+        await _productService.CreateCategoryAsync(category);
+        return RedirectToAction(nameof(Manage));
+    }
+
+    // --- УПРАВЛІННЯ ТОВАРАМИ ---
+
     [Authorize(Roles = "Seller,Admin")]
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        ViewBag.Categories = await _context.Categories.ToListAsync() ?? new List<Category>();
+        var store = await GetUserStoreAsync();
+        if (store == null) return RedirectToAction("Index", "Account");
+
+        // Завантажуємо категорії лише для цього магазину
+        ViewBag.Categories = await _productService.GetStoreCategoriesAsync(store.Id);
         return View(new Product());
     }
 
@@ -77,7 +121,7 @@ public class ProductsController : Controller
 
         if (!ModelState.IsValid)
         {
-            ViewBag.Categories = await _context.Categories.ToListAsync() ?? new List<Category>();
+            ViewBag.Categories = await _productService.GetStoreCategoriesAsync(store.Id);
             return View(product);
         }
 
@@ -103,7 +147,8 @@ public class ProductsController : Controller
         var product = await _productService.GetProductByIdAsync(id);
         if (product == null || product.StoreId != store.Id) return NotFound();
 
-        ViewBag.Categories = await _context.Categories.ToListAsync() ?? new List<Category>();
+        // Завантажуємо категорії лише для цього магазину
+        ViewBag.Categories = await _productService.GetStoreCategoriesAsync(store.Id);
         return View(product);
     }
 
@@ -123,7 +168,7 @@ public class ProductsController : Controller
 
         if (!ModelState.IsValid)
         {
-            ViewBag.Categories = await _context.Categories.ToListAsync() ?? new List<Category>();
+            ViewBag.Categories = await _productService.GetStoreCategoriesAsync(store.Id);
             return View(product);
         }
 

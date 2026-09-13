@@ -1,7 +1,7 @@
-﻿@{ ViewData["Title"] = "Новое обращение"; }
+﻿@{ ViewData["Title"] = "Нове звернення"; }
 
 <div class="container mt-4" style="max-width: 600px;">
-    <h2>Связь с администрацией</h2>
+    <h2>Зв'язок  адміністрацією</h2>
 
     <form asp-action="Create" method="post">
         <div class="mb-3">
@@ -9,10 +9,10 @@
             <input type="text" name="subject" class="form-control" required />
         </div>
         <div class="mb-3">
-            <label class="form-label">Сообщение</label>
+            <label class="form-label">Повідомлення</label>
             <textarea name="message" class="form-control" rows="5" required></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Отправить</button>
+        <button type="submit" class="btn btn-primary">Відправити</button>
         <a asp-action="Index" class="btn btn-secondary">Назад</a>
     </form>
 </div>

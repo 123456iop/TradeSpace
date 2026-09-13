@@ -17,4 +17,6 @@ public interface IProductService
     Task UpdateProductAsync(Product product);
     Task DeleteProductAsync(Guid id, Guid storeId);
     Task<bool> UpdateStockAsync(Guid productId, int quantityChange);
+    Task<IEnumerable<Category>> GetStoreCategoriesAsync(Guid storeId);
+    Task<Category> CreateCategoryAsync(Category category);
 }

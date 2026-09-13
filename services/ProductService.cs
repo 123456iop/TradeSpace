@@ -41,7 +41,7 @@ namespace TradeSpace.Services
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
             var products = await query
-                .OrderByDescending(p => p.CreatedAt) // Обов'язково для Skip/Take
+                .OrderByDescending(p => p.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -110,6 +110,23 @@ namespace TradeSpace.Services
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        // Отримання категорій для конкретного магазину
+        public async Task<IEnumerable<Category>> GetStoreCategoriesAsync(Guid storeId)
+        {
+            return await _context.Categories
+                .Where(c => c.StoreId == storeId || c.StoreId == null)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+        }
+
+        // Створення нової категорії
+        public async Task<Category> CreateCategoryAsync(Category category)
+        {
+            _context.Categories.Add(category);
+            await _context.SaveChangesAsync();
+            return category;
         }
     }
 }

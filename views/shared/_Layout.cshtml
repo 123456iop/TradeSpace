@@ -23,6 +23,11 @@
             {
                 <a asp-controller="Account" asp-action="Index">Кабінет (@User.Identity.Name)</a>
 
+                @if (User.IsInRole("Seller") || User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Products" asp-action="Manage">Мій магазин</a>
+                }
+
                 @if (User.IsInRole("Admin"))
                 {
                     <a asp-controller="Admin" asp-action="Index">Адмін-панель</a>
