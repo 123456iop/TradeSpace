@@ -1,21 +1,77 @@
-﻿@model TradeSpace.Models.ViewModels.LoginViewModel
-@{ ViewData["Title"] = "Вхід"; }
+﻿@using TradeSpace.Models.ViewModels
+@model LoginViewModel
 
-<div class="container mt-5" style="max-width: 500px;">
-    <h2 class="mb-4">Вхід</h2>
-    <form asp-action="Login" method="post" class="card p-4 shadow-sm">
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-        
-        <div class="mb-3">
-            <label asp-for="Email" class="form-label">Email</label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger small"></span>
+@{
+    ViewData["Title"] = "Вхід - TradeSpace";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-header">
+        <h1>Вхід</h1>
+        <p>Увійдіть у свій акаунт, щоб продовжити</p>
+    </div>
+
+    <div class="auth-card">
+        <form asp-controller="Account" asp-action="Login" method="post">
+            
+            <div class="form-group">
+                <label asp-for="Email">Ваша електронна пошта</label>
+                <input asp-for="Email" class="form-input" placeholder="..." />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password">Пароль</label>
+                <div class="password-input-container">
+                    <input asp-for="Password" type="password" class="form-input" placeholder="..." id="passwordInput" />
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                        <!-- Іконка прихованого пароля (закрите око) -->
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-actions">
+                <label class="custom-checkbox">
+                    <input asp-for="RememberMe" type="checkbox" />
+                    <span class="checkmark"></span>
+                    Запам'ятати мене
+                </label>
+                <a asp-action="ForgotPassword" class="link-forgot">Забули пароль?</a>
+            </div>
+
+            <button type="submit" class="btn-submit">Увійти</button>
+        </form>
+
+        <div class="divider">
+            <span>або</span>
         </div>
-        <div class="mb-4">
-            <label asp-for="Password" class="form-label">Пароль</label>
-            <input asp-for="Password" class="form-control" />
-            <span asp-validation-for="Password" class="text-danger small"></span>
-        </div>
-        <button type="submit" class="btn btn-primary w-100">Увійти</button>
-    </form>
+
+        <!-- Форма для авторизації через Google -->
+        <form asp-controller="Account" asp-action="ExternalLogin" method="post" class="google-auth-form">
+            <button type="submit" name="provider" value="Google" class="btn-google">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" width="20" height="20" />
+                Продовжити з Google
+            </button>
+        </form>
+    </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Скрипт для показу/приховування пароля
+        function togglePasswordVisibility() {
+            var input = document.getElementById('passwordInput');
+            if (input.type === "password") {
+                input.type = "text";
+            } else {
+                input.type = "password";
+            }
+        }
+    </script>
+}

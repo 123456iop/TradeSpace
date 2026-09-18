@@ -33,6 +33,9 @@ public class LoginViewModel
     [Required(ErrorMessage = "Введіть пароль")]
     [DataType(DataType.Password)]
     public string Password { get; set; } = string.Empty;
+
+    // Додано для чекбокса "Запам'ятати мене"
+    public bool RememberMe { get; set; }
 }
 
 public class ChangePasswordViewModel
