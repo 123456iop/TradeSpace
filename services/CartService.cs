@@ -18,30 +18,33 @@ namespace TradeSpace.Services
 
         public async Task<Cart> GetCartByUserIdAsync(Guid userId)
         {
-            // Шукаємо кошик разом із його елементами (CartItem) та даними товарів
+            // Шукаємо кошик разом із його елементами та даними товарів
             var cart = await _context.Carts
                 .Include(c => c.Items)
                     .ThenInclude(i => i.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
-            // Якщо кошика ще немає - створюємо його, як це очікує контролер
+            // Якщо кошика ще немає - створюємо його
             if (cart == null)
             {
-                // Перевіряємо наявність користувача, щоб уникнути помилки FOREIGN KEY
+                // Перевіряємо, чи існує користувач у базі
                 var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
                 if (!userExists)
                 {
-                    var testUser = new User
-                    {
-                        Id = userId
-                    };
-                    _context.Users.Add(testUser);
-                    await _context.SaveChangesAsync();
+                    // Якщо користувача немає, ми не можемо створювати кошик через обмеження зовнішнього ключа.
+                    // Викидаємо зрозумілу помилку замість мовчазного створення тестового користувача, 
+                    // яке могло ламати DbContext.
+                    throw new Exception("Користувача не знайдено. Будь ласка, перезайдіть в систему.");
                 }
 
                 cart = new Cart { UserId = userId };
                 _context.Carts.Add(cart);
+                
+                // Одразу зберігаємо новий кошик у БД, щоб отримати його Id для товарів
                 await _context.SaveChangesAsync();
+                
+                // Ініціалізуємо порожню колекцію для уникнення NullReferenceException
+                cart.Items = new List<CartItem>();
             }
 
             return cart;
@@ -49,37 +52,57 @@ namespace TradeSpace.Services
 
         public async Task AddToCartAsync(Guid userId, Guid productId, int quantity)
         {
+            // 1. Отримуємо або створюємо кошик
             var cart = await GetCartByUserIdAsync(userId);
             
-            // Шукаємо товар безпосередньо у списку Items кошика
-            var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+            // 2. Шукаємо товар явним запитом до БД, щоб уникнути проблем із відстеженням (tracking)
+            // що викликають DbUpdateConcurrencyException
+            var existingItem = await _context.Set<CartItem>()
+                .FirstOrDefaultAsync(i => i.CartId == cart.Id && i.ProductId == productId);
 
             if (existingItem != null)
             {
+                // Якщо товар вже є, оновлюємо кількість та явно вказуємо EF Core про зміни
                 existingItem.Quantity += quantity;
+                _context.Set<CartItem>().Update(existingItem);
             }
             else
             {
-                cart.Items.Add(new CartItem
+                // Якщо товару немає, створюємо новий запис із явним вказуванням CartId
+                var newItem = new CartItem
                 {
+                    CartId = cart.Id,
                     ProductId = productId,
                     Quantity = quantity
-                });
+                };
+                
+                // Додаємо безпосередньо в таблицю CartItem
+                _context.Set<CartItem>().Add(newItem);
             }
 
+            // 3. Зберігаємо зміни
             await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveItemAsync(Guid cartItemId)
+        {
+            var item = await _context.Set<CartItem>().FindAsync(cartItemId);
+            if (item != null)
+            {
+                _context.Set<CartItem>().Remove(item);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task ClearCartAsync(Guid cartId)
         {
-            var cart = await _context.Carts
-                .Include(c => c.Items)
-                .FirstOrDefaultAsync(c => c.Id == cartId);
+            var items = await _context.Set<CartItem>()
+                .Where(i => i.CartId == cartId)
+                .ToListAsync();
 
-            if (cart != null && cart.Items.Any())
+            if (items.Any())
             {
-                // Очищаємо зв'язані елементи кошика
-                _context.RemoveRange(cart.Items);
+                _context.Set<CartItem>().RemoveRange(items);
                 await _context.SaveChangesAsync();
             }
         }
